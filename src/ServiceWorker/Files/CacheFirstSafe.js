@@ -58,8 +58,13 @@
     self.addEventListener('fetch', function (event) {
         var request = event.request;
 
+        // Always ignore pattern
+        if (patternToIgnore && request.url.match(patternToIgnore)) {
+          return;
+        }
+
         // Always fetch non-GET requests from the network
-        if (request.method !== 'GET' || request.url.match(/\/browserLink/ig) || (patternToIgnore && request.url.match(patternToIgnore))) {
+        if (request.method !== 'GET' || request.url.match(/\/browserLink/ig)) {
             event.respondWith(
                 fetch(request)
                     .catch(function () {
