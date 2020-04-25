@@ -20,7 +20,11 @@ namespace Sample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddProgressiveWebApp(new PwaOptions { RegisterServiceWorker = true });
+            services.AddProgressiveWebApp(new PwaOptions
+            {
+                RegisterServiceWorker = true,
+                PatternToIgnore = @"/\/noc\//ig",
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -30,7 +34,7 @@ namespace Sample
             {
                 app.UseBrowserLink();
             }
-                app.UseDeveloperExceptionPage();
+            app.UseDeveloperExceptionPage();
 
             app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();

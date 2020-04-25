@@ -43,6 +43,7 @@ namespace WebEssentials.AspNetCore.Pwa
                 string modified = js
                     .Replace("{version}", _options.CacheId + "::" + _options.Strategy)
                     .Replace("{routes}", string.Join(",", _options.RoutesToPreCache.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(r => "'" + r.Trim() + "'")))
+                    .Replace("{patternToIgnore}", string.IsNullOrEmpty(_options.PatternToIgnore) ? "null" : _options.PatternToIgnore)
                     .Replace("{offlineRoute}", _options.BaseRoute + _options.OfflineRoute);
 
                 return Content(modified);
