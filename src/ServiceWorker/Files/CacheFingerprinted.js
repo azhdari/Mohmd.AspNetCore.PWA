@@ -34,6 +34,10 @@
         }
     }
 
+    function isChromeExtension(request) {
+        return request.url.match(/^chrome-extension:\/\//ig)
+    }
+
     self.addEventListener('install', function (event) {
         event.waitUntil(updateStaticCache());
     });
@@ -64,7 +68,7 @@
         }
 
         // Always fetch non-GET requests from the network
-        if (request.method !== 'GET' || request.url.match(/\/browserLink/ig)) {
+        if (request.method !== 'GET' || request.url.match(/\/browserLink/ig) || isChromeExtension(request)) {
             event.respondWith(
                 fetch(request)
                     .catch(function () {
