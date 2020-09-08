@@ -19,12 +19,11 @@ namespace Sample
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var option = new PwaOptions();
+            Configuration.GetSection("pwa").Bind(option);
+
             services.AddMvc();
-            services.AddProgressiveWebApp(new PwaOptions
-            {
-                RegisterServiceWorker = true,
-                PatternToIgnore = @"/\/noc\//ig",
-            });
+            services.AddProgressiveWebApp(option);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
