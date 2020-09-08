@@ -1,7 +1,6 @@
 # ASP.NET Core Progressive Web Apps
 
-[![Build status](https://ci.appveyor.com/api/projects/status/033jspebqrwao5o4?svg=true)](https://ci.appveyor.com/project/madskristensen/webessentials-aspnetcore-serviceworker)
-[![NuGet](https://img.shields.io/nuget/v/WebEssentials.AspNetCore.PWA.svg)](https://nuget.org/packages/WebEssentials.AspNetCore.PWA/)
+[![NuGet](https://img.shields.io/nuget/v/Mohmd.AspNetCore.PWA.svg)](https://www.nuget.org/packages/Mohmd.AspNetCore.PWA/)
 
 A [Progressive Web App](https://developers.google.com/web/progressive-web-apps/) (PWA) is a set of technologies that can be applied to any type of website and web application, and it consist of 3 components:
 
@@ -16,12 +15,12 @@ This components makes Web App Manifest a natural and integrated part of any ASP.
 Building Progressive Web Apps have never been easier!
 
 ## Install
-To add the PWA service to your ASP.NET Core 2.0 application, simply add the NuGet package [WebEssentials.AspNetCore.PWA](https://www.nuget.org/packages/WebEssentials.AspNetCore.PWA/).
+To add the PWA service to your ASP.NET Core 2.0 application, simply add the NuGet package [Mohmd.AspNetCore.PWA](https://www.nuget.org/packages/Mohmd.AspNetCore.PWA/).
 
 Either do that through Visual Studio's NuGet Package Manager or the command line like this:
 
 ```cmd
-dotnet add package WebEssentials.AspNetCore.PWA
+dotnet add package Mohmd.AspNetCore.PWA
 ```
 
 ## Getting started
@@ -211,6 +210,33 @@ public void ConfigureServices(IServiceCollection services)
   }
 }
 ```
+
+## Ignoring url patterns
+Specify multiple regular expression to ignore completely by service worker.  
+This is good idea for **video's range processing**.  
+Use `,` to separate patterns.
+
+```c#
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMvc();
+    services.AddServiceWorker(new PwaOptions
+    {
+        PatternToIgnore = "/\\/foo\\//ig,/\\/bar\\//ig"
+    });
+}
+```
+
+...or in `appsettings.json`:
+
+```json
+{
+  "serviceworker": {
+    "PatternToIgnore": "/\\/foo\\//ig,/\\/bar\\//ig"
+  }
+}
+```
+
 
 ## Caching strategies
 Specify which caching strategy you want to use if you want a different one than the default (CacheFirstSafe):
