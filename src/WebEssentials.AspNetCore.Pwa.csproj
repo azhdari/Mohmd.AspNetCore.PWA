@@ -5,7 +5,7 @@
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Mohmd.AspNetCore.Pwa.xml</DocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageTags>asp.net, performance, speed, cache, caching</PackageTags>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <Authors>Mohammad Azhdari</Authors>
     <Description>Service worker and Web App Manifest support for ASP.NET Core projects that provides offline support as well as client-side caching.</Description>
     <Copyright>Copyright © Mohammad Azhdari</Copyright>
