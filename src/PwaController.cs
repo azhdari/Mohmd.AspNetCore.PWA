@@ -37,13 +37,17 @@ namespace WebEssentials.AspNetCore.Pwa
             Assembly assembly = typeof(PwaController).Assembly;
             Stream resourceStream = assembly.GetManifestResourceStream($"WebEssentials.AspNetCore.Pwa.ServiceWorker.Files.{fileName}");
 
+            Func<string, string> Rejoin(string splitter, Func<string, string> iterate)
+                => (string text)
+                => string.Join(splitter, text.Split(new[] { splitter }, StringSplitOptions.RemoveEmptyEntries).Select(iterate));
+
             using (var reader = new StreamReader(resourceStream))
             {
                 string js = await reader.ReadToEndAsync();
                 string modified = js
                     .Replace("{version}", _options.CacheId + "::" + _options.Strategy)
-                    .Replace("{routes}", string.Join(",", _options.RoutesToPreCache.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(r => "'" + r.Trim() + "'")))
-                    .Replace("{patternToIgnore}", string.IsNullOrEmpty(_options.PatternToIgnore) ? "null" : _options.PatternToIgnore)
+                    .Replace("{routes}", Rejoin(",", r => "'" + r.Trim() + "'")(_options.RoutesToPreCache))
+                    .Replace("{patternToIgnore}", Rejoin(",", r => r.Trim())(_options.PatternToIgnore))
                     .Replace("{offlineRoute}", _options.BaseRoute + _options.OfflineRoute);
 
                 return Content(modified);

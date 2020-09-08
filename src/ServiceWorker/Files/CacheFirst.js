@@ -4,7 +4,7 @@
     // Update 'version' if you need to refresh the cache
     var version = '{version}';
     var offlineUrl = '{offlineRoute}';
-    var patternToIgnore = {patternToIgnore};
+    var patternToIgnore = [{patternToIgnore}];
 
     // Store core files in a cache (including a page to display when offline)
     function updateStaticCache() {
@@ -57,7 +57,7 @@
         var request = event.request;
 
         // Always ignore pattern
-        if (patternToIgnore && request.url.match(patternToIgnore)) {
+        if (patternToIgnore && patternToIgnore.length && patternToIgnore.filter(p => request.url.match(p)).length) {
           return;
         }
 
