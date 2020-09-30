@@ -4,7 +4,7 @@
     // Update 'version' if you need to refresh the cache
     var version = '{version}';
     var offlineUrl = "{offlineRoute}";
-    var patternToIgnore = [{patternToIgnore}];
+    var patternToIgnore = [{ patternToIgnore }];
 
     // Store core files in a cache (including a page to display when offline)
     function updateStaticCache() {
@@ -12,7 +12,7 @@
             .then(function (cache) {
                 return cache.addAll([
                     offlineUrl,
-                    {routes}
+                    { routes }
                 ]);
             });
     }
@@ -30,6 +30,65 @@
 
     function isChromeExtension(request) {
         return request.url.match(/^chrome-extension:\/\//ig)
+    }
+
+    function extractRange(request) {
+        const bytes = /^bytes\=(\d+)\-(\d+)?$/g.exec(
+            request.headers.get('range')
+        );
+        if (bytes) {
+            const start = Number(bytes[1]);
+            const end = Number(bytes[2]) || arrayBuffer.byteLength - 1;
+
+            return {
+                start: start,
+                end: end
+            }
+        }
+    }
+
+    function networkThenCacheRangeRequest(request) {
+        return fetch(request)
+            .then(res => {
+                addToCache(request, res);
+                return res.arrayBuffer();
+            })
+            .catch(function () {
+                return caches
+                    .open(version)
+                    .then(function (cache) {
+                        return cache.match(request.url);
+                    })
+                    .then(function (res) {
+                        if (res) {
+                            return res.arrayBuffer();
+                        } else {
+                            throw new Error("Unable to fetch request neither from network nor static cache.");
+                        }
+                    })
+            });
+    }
+
+    function processRangeRequest(request) {
+        return networkThenCacheRangeRequest(request)
+            .then(function (arrayBuffer) {
+                const bytes = extractRange(request);
+                if (bytes) {
+                    return new Response(arrayBuffer.slice(bytes.start, bytes.end + 1), {
+                        status: 206,
+                        statusText: 'Partial Content',
+                        headers: [
+                            ['Content-Range', `bytes ${bytes.start}-${bytes.end}/${arrayBuffer.byteLength}`]
+                        ]
+                    });
+                } else {
+                    return new Response(null, {
+                        status: 416,
+                        statusText: 'Range Not Satisfiable',
+                        headers: [['Content-Range', `*/${arrayBuffer.byteLength}`]]
+                    });
+                }
+            });
     }
 
     self.addEventListener('install', function (event) {
@@ -57,12 +116,28 @@
         var request = event.request;
 
         // Always ignore pattern
-        if (patternToIgnore && patternToIgnore.length && patternToIgnore.filter(p => request.url.match(p)).length) {
-          return;
+        if (patternToIgnore.filter(p => request.url.match(p)).length) {
+            return;
+        }
+
+        // Always ignore chromium extensions
+        if (isChromeExtension(request)) {
+            return;
+        }
+
+        // Response to range requests properly
+        if (request.headers.get('range')) {
+            event.respondWith(
+                processRangeRequest(request)
+                    .catch(function () {
+                        return caches.match(offlineUrl);
+                    })
+            );
+            return;
         }
 
         // Always fetch non-GET requests from the network
-        if (request.method !== 'GET' || request.url.match(/\/browserLink/ig) || isChromeExtension(request)) {
+        if (request.method !== 'GET' || request.url.match(/\/browserLink/ig)) {
             event.respondWith(
                 fetch(request)
                     .catch(function () {
