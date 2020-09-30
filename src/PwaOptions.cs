@@ -17,6 +17,7 @@ namespace WebEssentials.AspNetCore.Pwa
             Strategy = ServiceWorkerStrategy.CacheFirstSafe;
             RoutesToPreCache = "";
             PatternToIgnore = "";
+            PatternToIgnoreDelimiter = ",";
             BaseRoute = "";
             OfflineRoute = Constants.Offlineroute;
             RegisterServiceWorker = true;
@@ -32,6 +33,7 @@ namespace WebEssentials.AspNetCore.Pwa
             CacheId = config["pwa:cacheId"] ?? CacheId;
             RoutesToPreCache = config["pwa:routesToPreCache"] ?? RoutesToPreCache;
             PatternToIgnore = config["pwa:patternToIgnore"] ?? PatternToIgnore;
+            PatternToIgnoreDelimiter = config["pwa:patternToIgnoreDelimiter"] ?? PatternToIgnoreDelimiter;
             BaseRoute = config["pwa:baseRoute"] ?? BaseRoute;
             OfflineRoute = config["pwa:offlineRoute"] ?? OfflineRoute;
 
@@ -83,9 +85,14 @@ namespace WebEssentials.AspNetCore.Pwa
         public string RoutesToPreCache { get; set; }
 
         /// <summary>
-        /// A comma separated list of routes to ignore in caching
+        /// List of routes to ignore in caching, separated by PatternToIgnoreDelimiter
         /// </summary>
         public string PatternToIgnore { get; set; }
+
+        /// <summery>
+        /// Delimiter for PatternToIgnore
+        /// </summery>
+        public string PatternToIgnoreDelimiter { get; set; }
 
         /// <summary>
         /// The base route to the application.
