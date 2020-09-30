@@ -32,13 +32,13 @@
         return request.url.match(/^chrome-extension:\/\//ig)
     }
 
-    function extractRange(request) {
+    function extractRange(request, byteLength) {
         const bytes = /^bytes\=(\d+)\-(\d+)?$/g.exec(
             request.headers.get('range')
         );
         if (bytes) {
             const start = Number(bytes[1]);
-            const end = Number(bytes[2]) || arrayBuffer.byteLength - 1;
+            const end = Number(bytes[2]) || byteLength - 1;
 
             return {
                 start: start,
@@ -72,7 +72,7 @@
     function processRangeRequest(request) {
         return networkThenCacheRangeRequest(request)
             .then(function (arrayBuffer) {
-                const bytes = extractRange(request);
+                const bytes = extractRange(request, arrayBuffer.byteLength);
                 if (bytes) {
                     return new Response(arrayBuffer.slice(bytes.start, bytes.end + 1), {
                         status: 206,
