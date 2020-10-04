@@ -25,6 +25,7 @@ namespace WebEssentials.AspNetCore.Pwa
             EnableCspNonce = false;
             ServiceWorkerCacheControlMaxAge = 60 * 60 * 24 * 30;    // 30 days
             WebManifestCacheControlMaxAge = 60 * 60 * 24 * 30;      // 30 days
+            InstallImmediately = false;
         }
 
         internal PwaOptions(IConfiguration config)
@@ -65,6 +66,11 @@ namespace WebEssentials.AspNetCore.Pwa
             if (int.TryParse(config["pwa:WebManifestCacheControlMaxAge"], out int webManifestCacheControlMaxAge))
             {
                 WebManifestCacheControlMaxAge = webManifestCacheControlMaxAge;
+            }
+
+            if (bool.TryParse(config["pwa:installImmediately"] ?? "true", out bool installImmediately))
+            {
+                InstallImmediately = installImmediately;
             }
         }
 
@@ -132,5 +138,10 @@ namespace WebEssentials.AspNetCore.Pwa
         /// Generate code even on HTTP connection. Necessary for SSL offloading.
         /// </summary>
         public bool AllowHttp { get; set; }
+
+        /// <summary>
+        /// On install event, it will skipWaiting and while activating, it will refresh all clients
+        /// </summary>
+        public bool InstallImmediately { get; set; } = false;
     }
 }

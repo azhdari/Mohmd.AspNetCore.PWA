@@ -5,6 +5,7 @@
     var version = '{version}';
     var offlineUrl = '{offlineRoute}';
     var patternToIgnore = [{patternToIgnore}];
+    var installImmediately = {installImmediately};
 
     // Store core files in a cache (including a page to display when offline)
     function updateStaticCache() {
@@ -85,10 +86,23 @@
     }
 
     self.addEventListener('install', function (event) {
+        if (installImmediately) {
+            self.skipWaiting();
+        }
+
         event.waitUntil(updateStaticCache());
     });
 
     self.addEventListener('activate', function (event) {
+        if (installImmediately) {
+            self.clients.matchAll()
+                .then(clients => clients.forEach(client => {
+                    if (client.url && "navigate" in client) {
+                        client.navigate(client.url);
+                    }
+                }));
+        }
+
         event.waitUntil(
             caches.keys()
                 .then(function (keys) {
